@@ -5,7 +5,7 @@ class FilmListing extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      filter: 'all'
+      filter: 'all',
     }
   }
 
@@ -13,21 +13,44 @@ class FilmListing extends Component {
     this.setState({
       filter: filter
     })
-    console.log('Setting filter to: ' + filter)
+    console.log('Setting filter to: ' + filter);
   }
-
 
   render() {
 
-    const { films } = this.props
-    const allFilter = this.state.filter === 'all' ? 'is-active' : ''
-    const favesFilter = this.state.filter === 'faves' ? 'is-active' : ''
+    const { faves, films } = this.props
 
-    let allFilms = films.map(function(film, index) {
-      return (
-        <FilmRow title={film.title} date={film.release_date} key={film.id} url={film.poster_path}/>
-      )
-    })
+    const allFilter = (this.state.filter === 'all' ? 'is-active' : '')
+    const favesFilter = (this.state.filter === 'faves' ? 'is-active' : '')
+
+    let allFilms = []
+    if (this.state.filter === 'all') {
+      allFilms = films.map((film, index) => {
+        return (
+          <FilmRow onFaveToggle={ () => this.props.onFaveToggle(film) }
+            title={film.title}
+            date={film.release_date}
+            key={film.id}
+            url={film.poster_path}
+            isFave={ faves.includes(film) }
+            onDetailsClick={ () => this.props.onDetailsClick(film) }
+          />
+        )
+      })
+    } else {
+      allFilms = faves.map((film, index) => {
+        return (
+          <FilmRow onFaveToggle={ () => this.props.onFaveToggle(film) }
+            title={film.title}
+            date={film.release_date}
+            key={film.id}
+            url={film.poster_path}
+            isFave={ faves.includes(film) }
+            onDetailsClick={ () => this.props.onDetailsClick(film) }
+          />
+        )
+      })
+    }
 
     return (
       <div className="film-list">
@@ -41,7 +64,7 @@ class FilmListing extends Component {
 
           <div className={"film-list-filter " + favesFilter} onClick={ () => this.handleFilterClick('faves')}>
             <span>FAVES</span>
-            <span className="section-count">0</span>
+            <span className="section-count">{faves.length}</span>
           </div>
 
         </div>
